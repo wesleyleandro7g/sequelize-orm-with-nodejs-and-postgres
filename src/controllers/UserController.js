@@ -1,4 +1,5 @@
 const User = require("../models/User");
+const Address = require("../models/Address");
 
 module.exports = {
   async create(req, res) {
@@ -15,10 +16,38 @@ module.exports = {
     return res.json(user);
   },
 
-  async select(req, res) {
-    const { id } = req.body;
-    const user = await User.findByPk(id);
+  async selectOne(req, res) {
+    try {
+      const { id } = req.params;
+      const user = await User.findByPk(id, {
+        include: { association: "address" },
+      });
 
-    return res.json(user);
+      if (!user) {
+        return res.send({ error: "user not found" });
+      }
+
+      // const address = await Address.findAll({
+      //   where: {
+      //     user_id: id,
+      //   },
+      // });
+
+      return res.send({ user: user, address: address });
+    } catch (error) {
+      return res.send({ error: error.message });
+    }
+  },
+
+  async delete(req, res) {
+    try {
+      const id = req.params.id;
+      await User.destroy({ where: { id } });
+
+      return res.send("ok");
+    } catch (error) {
+      console.log(error);
+      return res.send({ error: error.message });
+    }
   },
 };
