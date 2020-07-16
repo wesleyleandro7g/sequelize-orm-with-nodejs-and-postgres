@@ -20,7 +20,7 @@ module.exports = {
     try {
       const { id } = req.params;
       const user = await User.findByPk(id, {
-        include: { association: "address" },
+        include: { model: Address, as: "address" },
       });
 
       if (!user) {
